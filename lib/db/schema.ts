@@ -45,10 +45,10 @@ export const snippetRelation = relations(snippetTable, ({ one }) => ({
   }),
 }));
 
-export const snippetUserVisibilityIndex = index("user_visibility_index").on(
-  snippetTable.userId,
-  snippetTable.visibility
-);
+// export const snippetUserVisibilityIndex = index("user_visibility_index").on(
+//   snippetTable.userId,
+//   snippetTable.visibility
+// );
 
 export type userType = InferSelectModel<typeof userTable>;
 export type snippetType = InferSelectModel<typeof snippetTable>;

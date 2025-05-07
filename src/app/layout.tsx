@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 
 
 const poppins = Poppins({
@@ -27,7 +29,11 @@ export default function RootLayout({
         <body
           className={poppins.className}
         >
-          {children}
+          <Navbar />
+          <div className="mt-20 min-h-screen">
+            {children}
+          </div>
+          <Footer />
         </body>
       </html>
     </ClerkProvider>

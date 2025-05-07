@@ -1,129 +1,19 @@
 "use client"
-import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { snippets, testimonials, features } from "../../data"
+import * as Icons from "lucide-react"
+import { LucideIcon } from 'lucide-react';
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
 
-  // Sample code snippets for the landing page
-  const snippets = [
-    {
-      title: "ReactJS Component",
-      language: "jsx",
-      code: `import React, { useState } from 'react';
-
-function Counter() {
-  const [count, setCount] = useState(0);
-  
-  return (
-    <div className="counter">
-      <h2>Count: {count}</h2>
-      <button onClick={() => setCount(count + 1)}>
-        Increment
-      </button>
-    </div>
-  );
-}`
-    },
-    {
-      title: "Python Function",
-      language: "python",
-      code: `def fibonacci(n):
-    """Return the nth Fibonacci number."""
-    if n <= 0:
-        return 0
-    elif n == 1:
-        return 1
-    else:
-        a, b = 0, 1
-        for _ in range(2, n + 1):
-            a, b = b, a + b
-        return b`
-    },
-    {
-      title: "CSS Animation",
-      language: "css",
-      code: `@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.animated-element {
-  animation: pulse 2s infinite ease-in-out;
-}`
-    }
-  ];
-
-  const features = [
-    {
-      icon: "far fa-save",
-      title: "Save & Organize",
-      description: "Store all your code snippets in one place with smart tagging and folders"
-    },
-    {
-      icon: "fas fa-search",
-      title: "Instant Search",
-      description: "Find any snippet in milliseconds with our powerful search engine"
-    },
-    {
-      icon: "fas fa-share-alt",
-      title: "Share Securely",
-      description: "Share snippets with your team or keep them private with granular permissions"
-    },
-    {
-      icon: "fas fa-code",
-      title: "Syntax Highlighting",
-      description: "Support for 100+ programming languages with beautiful syntax highlighting"
-    },
-    {
-      icon: "fas fa-sync",
-      title: "Sync Anywhere",
-      description: "Access your snippets from any device with real-time synchronization"
-    },
-    {
-      icon: "fas fa-bolt",
-      title: "Keyboard Shortcuts",
-      description: "Boost your productivity with customizable keyboard shortcuts"
-    }
-  ];
-
-  const testimonials = [
-    {
-      text: "SnipVault has transformed how our team shares and reuses code. It's an essential tool in our development workflow.",
-      author: "Sarah Chen",
-      role: "Lead Developer at TechFlow"
-    },
-    {
-      text: "The search functionality is lightning fast, and the organization features help me keep all my snippets neatly categorized.",
-      author: "Marcus Johnson",
-      role: "Full-Stack Engineer"
-    },
-    {
-      text: "I've tried many snippet managers, but SnipVault's user experience and feature set are unmatched. Worth every penny!",
-      author: "Aisha Patel",
-      role: "Software Architect"
-    }
-  ];
-
-  // Animation variants
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
   };
 
-  // Next feature every 5 seconds
   useEffect(() => {
     setIsMounted(true);
     const interval = setInterval(() => {
@@ -133,52 +23,13 @@ function Counter() {
   }, []);
 
   if (!isMounted) {
-    return null; // Prevents hydration errors
+    return null;
   }
 
   return (
     <div className="dark">
-      <Head>
-        <title>SnipVault - Smart Code Snippet Manager</title>
-        <meta name="description" content="Store, organize, and share your code snippets effortlessly with SnipVault." />
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-      </Head>
-
       <main className="bg-gray-900 text-gray-100 min-h-screen">
-        {/* Navigation */}
-        <nav className="border-b border-gray-800 backdrop-blur-md bg-gray-900/80 fixed w-full z-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16">
-              <div className="flex items-center">
-                <span className="text-xl font-bold text-emerald-500">
-                  <i className="fas fa-code-branch mr-2"></i>
-                  SnipVault
-                </span>
-              </div>
-              <div className="flex items-center space-x-4">
-                <button className="bg-transparent hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition">
-                  Features
-                </button>
-                <button className="bg-transparent hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition">
-                  Pricing
-                </button>
-                <button className="bg-transparent hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition">
-                  Docs
-                </button>
-                <button className="bg-transparent hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition">
-                  Blog
-                </button>
-                <button className="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium transition">
-                  Sign In
-                </button>
-                <button className="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-md text-sm font-medium transition">
-                  Get Started
-                </button>
-              </div>
-            </div>
-          </div>
-        </nav>
+
 
         {/* Hero Section */}
         <section className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -216,7 +67,7 @@ function Counter() {
               </p>
             </div>
 
-            <div className="lg:w-1/2 lg:pl-10">
+            <div className="lg:w-1/2 lg:pl-10 hidden sm:block">
               <div className="relative bg-gray-800 rounded-xl shadow-2xl shadow-emerald-500/10 min-h-[450px]">
                 <div className="flex bg-gray-900 px-4 py-2 items-center">
                   <div className="flex space-x-2">
@@ -292,22 +143,26 @@ function Counter() {
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {features.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  className="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10"
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeIn}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                >
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4">
-                    <i className={`${feature.icon} text-emerald-500 text-xl`}></i>
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                  <p className="text-gray-400">{feature.description}</p>
-                </motion.div>
-              ))}
+              {features.map((feature, index) => {
+                const LucideIcon = Icons[feature.icon as keyof typeof Icons] as LucideIcon;
+
+                return (
+                  <motion.div
+                    key={index}
+                    className="bg-gray-800 rounded-xl p-6 hover:bg-gray-750 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10"
+                    initial="hidden"
+                    animate="visible"
+                    variants={fadeIn}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                  >
+                    <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4">
+                      {LucideIcon && <LucideIcon className="text-emerald-500 w-6 h-6" />}
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                    <p className="text-gray-400">{feature.description}</p>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -539,71 +394,7 @@ function Counter() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="bg-gray-900 border-t border-gray-800 py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-              <div className="col-span-2">
-                <div className="text-xl font-bold text-emerald-500 mb-4">
-                  <i className="fas fa-code-branch mr-2"></i>
-                  SnipVault
-                </div>
-                <p className="text-gray-400 mb-4">
-                  The modern way to store and share code snippets.
-                </p>
-                <div className="flex space-x-4">
-                  <a href="#" className="text-gray-400 hover:text-white transition">
-                    <i className="fab fa-twitter"></i>
-                  </a>
-                  <a href="#" className="text-gray-400 hover:text-white transition">
-                    <i className="fab fa-github"></i>
-                  </a>
-                  <a href="#" className="text-gray-400 hover:text-white transition">
-                    <i className="fab fa-linkedin"></i>
-                  </a>
-                  <a href="#" className="text-gray-400 hover:text-white transition">
-                    <i className="fab fa-discord"></i>
-                  </a>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-medium mb-4">Product</h3>
-                <ul className="space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Features</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Pricing</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Changelog</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Roadmap</a></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-medium mb-4">Resources</h3>
-                <ul className="space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Documentation</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">API Reference</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Guides</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Blog</a></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-medium mb-4">Company</h3>
-                <ul className="space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">About</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Careers</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Contact</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Privacy</a></li>
-                </ul>
-              </div>
-            </div>
-            <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-400">© 2025 SnipVault. All rights reserved.</p>
-              <div className="mt-4 md:mt-0">
-                <a href="#" className="text-gray-400 hover:text-white transition mr-4">Terms</a>
-                <a href="#" className="text-gray-400 hover:text-white transition mr-4">Privacy</a>
-                <a href="#" className="text-gray-400 hover:text-white transition">Cookies</a>
-              </div>
-            </div>
-          </div>
-        </footer>
+
       </main>
     </div>
 

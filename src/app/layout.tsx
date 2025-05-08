@@ -29,11 +29,14 @@ export default function RootLayout({
         <body
           className={poppins.className}
         >
-          <Navbar />
-          <div className="mt-20 min-h-screen">
-            {children}
+          <div className="flex flex-col min-h-screen">
+
+            <Navbar />
+            <div className="flex-grow pt-16">
+              {children}
+            </div>
+            <Footer />
           </div>
-          <Footer />
         </body>
       </html>
     </ClerkProvider>

@@ -7,7 +7,7 @@ import {
   timestamp,
   index,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { InferInsertModel, relations } from "drizzle-orm";
 import { InferSelectModel } from "drizzle-orm";
 
 export const planEnum = pgEnum("plan", ["FREE", "GOLD", "DIAMOND"]);
@@ -52,3 +52,4 @@ export const snippetRelation = relations(snippetTable, ({ one }) => ({
 
 export type userType = InferSelectModel<typeof userTable>;
 export type snippetType = InferSelectModel<typeof snippetTable>;
+export type SnippetInsertType = InferInsertModel<typeof snippetTable>;

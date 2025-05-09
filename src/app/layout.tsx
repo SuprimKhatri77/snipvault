@@ -27,7 +27,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body
-          className={poppins.className}
+          className={`${poppins.className} bg-gray-900`}
         >
           <div className="flex flex-col min-h-screen">
 

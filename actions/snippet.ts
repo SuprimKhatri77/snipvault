@@ -134,7 +134,6 @@ export async function updateSnippetAction(
   }
 }
 
-// Keep the original updateSnippet function for other uses
 export async function updateSnippet(data: {
   id: string;
   title: string;

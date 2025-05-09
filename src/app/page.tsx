@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { snippets, testimonials, features } from "../../data"
 import * as Icons from "lucide-react"
 import { LucideIcon } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
@@ -55,12 +56,12 @@ export default function Home() {
                 SnipVault helps developers save, organize, and share code snippets with powerful search, syntax highlighting, and team collaboration.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg text-lg font-medium hover:from-emerald-400 hover:to-emerald-500 transition shadow-lg hover:shadow-emerald-500/20">
+                <Link href="/sign-in" className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg text-lg font-medium hover:from-emerald-400 hover:to-emerald-500 transition shadow-lg hover:shadow-emerald-500/20">
                   Start for Free
-                </button>
-                <button className="px-8 py-4 bg-gray-800 rounded-lg text-lg font-medium hover:bg-gray-700 transition flex items-center justify-center">
+                </Link>
+                <Link href="/sign-in" className="px-8 py-4 bg-gray-800 rounded-lg text-lg font-medium hover:bg-gray-700 transition flex items-center justify-center">
                   <i className="fab fa-github mr-2"></i> GitHub Sign In
-                </button>
+                </Link>
               </div>
               <p className="mt-4 text-gray-400 text-sm">
                 No credit card required · Free plan available

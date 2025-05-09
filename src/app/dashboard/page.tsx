@@ -125,7 +125,7 @@ export default function Dashboard() {
     }, [state.success, router])
 
     return (
-        <div className="relative bg-[#0F172A] text-gray-100">
+        <div className="relative bg-[#0F172A] text-gray-100 max-w-[1600px] mx-auto w-full">
             {/* Dashboard Layout */}
             <div className="flex flex-col lg:flex-row relative">
                 {/* Sidebar */}
@@ -144,7 +144,7 @@ export default function Dashboard() {
                                     <button
                                         className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg w-full ${activeFilter === "all"
                                             ? "bg-green-600 text-white"
-                                            : "text-gray-300 hover:bg-[#2D3748] hover:text-white"
+                                            : "text-gray-300 hover:bg-[#2D3748] hover:text-white cursor-pointer"
                                             }`}
                                         onClick={() => setActiveFilter("all")}
                                     >
@@ -154,7 +154,7 @@ export default function Dashboard() {
                                     <button
                                         className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg w-full ${activeFilter === "public"
                                             ? "bg-green-600 text-white"
-                                            : "text-gray-300 hover:bg-[#2D3748] hover:text-white"
+                                            : "text-gray-300 hover:bg-[#2D3748] hover:text-white cursor-pointer"
                                             }`}
                                         onClick={() => setActiveFilter("public")}
                                     >
@@ -164,7 +164,7 @@ export default function Dashboard() {
                                     <button
                                         className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg w-full ${activeFilter === "private"
                                             ? "bg-green-600 text-white"
-                                            : "text-gray-300 hover:bg-[#2D3748] hover:text-white"
+                                            : "text-gray-300 hover:bg-[#2D3748] hover:text-white cursor-pointer"
                                             }`}
                                         onClick={() => setActiveFilter("private")}
                                     >
@@ -212,16 +212,16 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             <div className="ml-4 flex items-center gap-3 md:ml-6">
-                                <button className="rounded-full bg-[#0F172A] p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                <button className="rounded-full bg-[#0F172A] p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer">
                                     <Filter className="h-5 w-5" />
                                 </button>
-                                <button className="rounded-full bg-[#0F172A] p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                <button className="rounded-full bg-[#0F172A] p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer" title="Order by Ascending">
                                     <SortAsc className="h-5 w-5" />
                                 </button>
                                 <div className="hidden md:block h-6 w-px bg-gray-600" />
                                 <button
                                     onClick={() => setShowForm(true)}
-                                    className="hidden md:flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                    className="hidden md:flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
                                 >
                                     <Plus className="mr-1 h-4 w-4" />
                                     New Snippet
@@ -266,7 +266,7 @@ export default function Dashboard() {
                                                 <Code className="mr-2 h-5 w-5 text-green-500" />
                                                 Create New Snippet
                                             </h2>
-                                            <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-white">
+                                            <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-white cursor-pointer">
                                                 <X className="h-5 w-5" />
                                             </button>
                                         </div>
@@ -279,7 +279,7 @@ export default function Dashboard() {
                                                     type="text"
                                                     id="title"
                                                     name="title"
-                                                    placeholder="file name with extension (e.g. helper.js)"
+                                                    placeholder="file name with extension (e.g. index.js)"
                                                     className="w-full bg-[#0F172A] border border-[#334155] rounded-lg py-2 px-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                                 />
                                                 {state.errors?.title && <p className="text-red-500 text-sm mt-1">{state.errors.title}</p>}
@@ -433,43 +433,44 @@ export default function Dashboard() {
                                             </div>
                                         </div>
 
-                                        {/* Card Footer */}
+                                        {/* card footer */}
                                         <div className="px-4 py-3 bg-[#1A2234] border-t border-[#334155]">
-                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                                                <div className="flex items-center text-xs text-gray-400">
-                                                    <User className="h-3 w-3 mr-1" />
-                                                    <span className="mr-3">You</span>
-                                                    <Clock className="h-3 w-3 mr-1" />
-                                                    <span>{formatDate(snippet.createdAt)}</span>
+                                            <div className="flex sm:flex-row sm:items-center gap-2">
+                                                <div className="flex items-center text-xs text-gray-400 min-w-0 truncate">
+                                                    <User className="h-3 w-3 flex-shrink-0 mr-1" />
+                                                    <span className="mr-2 flex-shrink-0">You</span>
+                                                    <Clock className="h-3 w-3 flex-shrink-0 mr-1" />
+                                                    <span className="truncate">{formatDate(snippet.createdAt)}</span>
                                                 </div>
 
-                                                <div className="flex space-x-2">
+
+                                                <div className="flex items-center gap-2 flex-shrink-0 sm:ml-auto">
                                                     <button
                                                         onClick={() => copyToClipboard(snippet.snippet, snippet.id)}
-                                                        className={`p-1.5 rounded-md flex items-center text-xs font-medium transition-colors ${copied === snippet.id
+                                                        className={`cursor-pointer px-2 py-1.5 rounded-md flex items-center text-xs font-medium transition-colors ${copied === snippet.id
                                                             ? "bg-green-900/50 text-green-300"
                                                             : "bg-[#0F172A] text-gray-400 hover:text-white hover:bg-[#1E293B]"
                                                             }`}
                                                     >
                                                         {copied === snippet.id ? (
                                                             <>
-                                                                <Check className="h-3 w-3 mr-1" />
-                                                                Copied
+                                                                <Check className="h-3 w-3 mr-1 flex-shrink-0" />
+                                                                <span className="flex-shrink-0">Copied</span>
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <Copy className="h-3 w-3 mr-1" />
-                                                                Copy
+                                                                <Copy className="h-3 w-3 mr-1 flex-shrink-0" />
+                                                                <span className="flex-shrink-0">Copy</span>
                                                             </>
                                                         )}
                                                     </button>
 
                                                     <Link
                                                         href={`/snippets/${snippet.id}`}
-                                                        className="p-1.5 rounded-md flex items-center text-xs font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
+                                                        className="px-2 py-1.5 rounded-md flex items-center text-xs font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
                                                     >
-                                                        <ExternalLink className="h-3 w-3 mr-1" />
-                                                        View Details
+                                                        <ExternalLink className="h-3 w-3 mr-1 flex-shrink-0" />
+                                                        <span className="flex-shrink-0">View Details</span>
                                                     </Link>
                                                 </div>
                                             </div>

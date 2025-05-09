@@ -3,7 +3,7 @@ import { Code, Twitter, Github, Linkedin, MessageSquare } from "lucide-react"
 export default function Footer() {
     return (
         <footer className="bg-[#0F172A] border-t border-[#334155] py-12 w-full mt-auto relative z-20">
-            <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
                     <div className="col-span-2">
                         <div className="flex items-center text-xl font-bold text-white mb-4">

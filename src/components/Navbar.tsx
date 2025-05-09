@@ -11,7 +11,7 @@ export default async function Navbar() {
 
     return (
         <nav className="bg-[#0F172A] border-b border-[#334155] fixed top-0 w-full z-50">
-            <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
                     <div className="flex items-center">
                         <Link href="/" className="flex items-center">

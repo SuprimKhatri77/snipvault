@@ -4,23 +4,26 @@ import { useState, useEffect, useRef } from "react"
 import { useActionState } from "react"
 import { addSnippet, type FormState } from "../../../actions/snippet"
 import { getAllSnippets } from "../../../data/snippet"
+import Link from "next/link"
 import {
-    Clipboard,
     Eye,
     EyeOff,
     X,
     Plus,
     Code,
     Search,
-    Calendar,
     Filter,
     SortAsc,
-    Trash2,
-    Edit,
-    Share2,
+    Copy,
+    Check,
+    FileCode,
+    User,
+    Clock,
+    ExternalLink,
 } from "lucide-react"
 import type { snippetType } from "../../../lib/db/schema"
 import { motion, AnimatePresence } from "framer-motion"
+import { useRouter } from "next/navigation"
 
 export default function Dashboard() {
     const initialState: FormState = { errors: {} }
@@ -31,13 +34,12 @@ export default function Dashboard() {
     const [loading, setLoading] = useState<boolean>(true)
     const [copied, setCopied] = useState<string>("")
     const [activeFilter, setActiveFilter] = useState<string>("all")
-    const [expandedSnippet, setExpandedSnippet] = useState<string | null>(null)
     const sidebarRef = useRef<HTMLDivElement>(null)
+    const router = useRouter()
 
     useEffect(() => {
         const fetchSnippets = async () => {
             try {
-                // Use the server action to get snippets
                 const data = await getAllSnippets()
                 setSnippets(data || [])
             } catch (error) {
@@ -56,10 +58,6 @@ export default function Dashboard() {
         setTimeout(() => setCopied(""), 2000)
     }
 
-    const toggleExpandSnippet = (id: string) => {
-        setExpandedSnippet(expandedSnippet === id ? null : id)
-    }
-
     const filteredSnippets = snippets.filter(
         (snippet) =>
             snippet.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,11 +70,65 @@ export default function Dashboard() {
             ? filteredSnippets
             : filteredSnippets.filter((snippet) => snippet.visibility === activeFilter.toUpperCase())
 
+    const getLanguageIcon = (title: string) => {
+        const extension = title.split(".").pop()?.toLowerCase() || ""
+
+        switch (extension) {
+            case "js":
+            case "jsx":
+                return "bg-yellow-500"
+            case "ts":
+            case "tsx":
+                return "bg-blue-500"
+            case "py":
+                return "bg-green-500"
+            case "html":
+                return "bg-orange-500"
+            case "css":
+                return "bg-purple-500"
+            case "json":
+                return "bg-gray-500"
+            case "md":
+                return "bg-teal-500"
+            default:
+                return "bg-emerald-500"
+        }
+    }
+
+    const formatDate = (dateInput: string | Date | null | undefined) => {
+        if (!dateInput) return ""
+
+        const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput
+        const now = new Date()
+
+        if (date.toDateString() === now.toDateString()) {
+            return `Today at ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+        }
+
+        const yesterday = new Date(now)
+        yesterday.setDate(now.getDate() - 1)
+        if (date.toDateString() === yesterday.toDateString()) {
+            return "Yesterday"
+        }
+
+        return date.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        })
+    }
+
+    useEffect(() => {
+        if (state.success) {
+            router.refresh()
+        }
+    }, [state.success, router])
+
     return (
         <div className="relative bg-[#0F172A] text-gray-100">
             {/* Dashboard Layout */}
             <div className="flex flex-col lg:flex-row relative">
-                {/* Sidebar Container - This will be relative positioned */}
+                {/* Sidebar */}
                 <div className="lg:w-64 relative">
                     <div
                         ref={sidebarRef}
@@ -329,73 +381,100 @@ export default function Dashboard() {
                                 )}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                                 {displaySnippets.map((snippet) => (
-                                    <div
+                                    <motion.div
                                         key={snippet.id}
-                                        className="bg-[#1E293B] rounded-xl border border-[#334155] overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="group flex flex-col bg-gradient-to-br from-[#1E293B] to-[#0F172A] rounded-xl border border-[#334155] overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:border-[#475569]"
                                     >
-                                        <div className="p-4 border-b border-[#334155]">
-                                            <div className="flex justify-between items-start">
-                                                <div className="flex-1 mr-4">
-                                                    <h3 className="font-semibold text-lg text-white flex items-center">{snippet.title}</h3>
-                                                    <p className="text-gray-400 text-sm mt-1">{snippet.description}</p>
+                                        {/* Card Header */}
+                                        <div className="p-4 flex items-start justify-between">
+                                            <div className="flex items-start space-x-3">
+                                                <div className={`flex-shrink-0 p-2 rounded-md ${getLanguageIcon(snippet.title)}`}>
+                                                    <FileCode className="h-5 w-5 text-white" />
                                                 </div>
-                                                <div className="flex items-center">
-                                                    <span
-                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${snippet.visibility === "PRIVATE"
-                                                            ? "bg-gray-700 text-gray-300"
-                                                            : "bg-green-700 text-green-100"
+                                                <div>
+                                                    <h3 className="font-medium text-lg text-white group-hover:text-green-400 transition-colors duration-200">
+                                                        {snippet.title}
+                                                    </h3>
+                                                    <p className="text-gray-400 text-sm mt-1 line-clamp-2">
+                                                        {snippet.description || "No description provided"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex-shrink-0">
+                                                <span
+                                                    className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${snippet.visibility === "PRIVATE"
+                                                        ? "bg-gray-800 text-gray-300 border border-gray-700"
+                                                        : "bg-green-900/50 text-green-300 border border-green-800"
+                                                        }`}
+                                                >
+                                                    {snippet.visibility === "PRIVATE" ? (
+                                                        <EyeOff className="mr-1 h-3 w-3" />
+                                                    ) : (
+                                                        <Eye className="mr-1 h-3 w-3" />
+                                                    )}
+                                                    {snippet.visibility === "PRIVATE" ? "Private" : "Public"}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Code Preview */}
+                                        <div className="flex-1 px-4 pb-2">
+                                            <div className="relative rounded-lg bg-[#0D1117] max-h-32 overflow-hidden">
+                                                <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-[#161B22] to-transparent pointer-events-none z-10"></div>
+                                                <pre className="p-3 text-sm font-mono whitespace-pre-wrap text-gray-300 overflow-hidden">
+                                                    {snippet.snippet.length > 200 ? `${snippet.snippet.substring(0, 200)}...` : snippet.snippet}
+                                                </pre>
+                                                <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#0D1117] to-transparent pointer-events-none z-10"></div>
+                                            </div>
+                                        </div>
+
+                                        {/* Card Footer */}
+                                        <div className="px-4 py-3 bg-[#1A2234] border-t border-[#334155]">
+                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                                <div className="flex items-center text-xs text-gray-400">
+                                                    <User className="h-3 w-3 mr-1" />
+                                                    <span className="mr-3">You</span>
+                                                    <Clock className="h-3 w-3 mr-1" />
+                                                    <span>{formatDate(snippet.createdAt)}</span>
+                                                </div>
+
+                                                <div className="flex space-x-2">
+                                                    <button
+                                                        onClick={() => copyToClipboard(snippet.snippet, snippet.id)}
+                                                        className={`p-1.5 rounded-md flex items-center text-xs font-medium transition-colors ${copied === snippet.id
+                                                            ? "bg-green-900/50 text-green-300"
+                                                            : "bg-[#0F172A] text-gray-400 hover:text-white hover:bg-[#1E293B]"
                                                             }`}
                                                     >
-                                                        {snippet.visibility === "PRIVATE" ? (
-                                                            <EyeOff className="mr-1 h-3 w-3" />
+                                                        {copied === snippet.id ? (
+                                                            <>
+                                                                <Check className="h-3 w-3 mr-1" />
+                                                                Copied
+                                                            </>
                                                         ) : (
-                                                            <Eye className="mr-1 h-3 w-3" />
+                                                            <>
+                                                                <Copy className="h-3 w-3 mr-1" />
+                                                                Copy
+                                                            </>
                                                         )}
-                                                        {snippet.visibility === "PRIVATE" ? "Private" : "Public"}
-                                                    </span>
+                                                    </button>
+
+                                                    <Link
+                                                        href={`/snippets/${snippet.id}`}
+                                                        className="p-1.5 rounded-md flex items-center text-xs font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
+                                                    >
+                                                        <ExternalLink className="h-3 w-3 mr-1" />
+                                                        View Details
+                                                    </Link>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center mt-4 text-xs text-gray-500">
-                                                <Calendar className="h-3 w-3 mr-1" />
-                                                <span>{new Date(snippet.createdAt || "").toLocaleDateString()}</span>
-                                            </div>
                                         </div>
-                                        <div
-                                            className={`p-4 bg-[#0F172A] ${expandedSnippet === snippet.id ? "max-h-96" : "max-h-32"} overflow-auto transition-all duration-200`}
-                                        >
-                                            <pre className="text-sm font-mono whitespace-pre-wrap text-gray-300">{snippet.snippet}</pre>
-                                        </div>
-                                        <div className="flex items-center justify-between p-2 bg-[#1E293B] border-t border-[#334155]">
-                                            <div className="flex space-x-1">
-                                                <button className="p-1 text-gray-400 hover:text-white rounded-md hover:bg-[#334155]">
-                                                    <Edit className="h-4 w-4" />
-                                                </button>
-                                                <button className="p-1 text-gray-400 hover:text-white rounded-md hover:bg-[#334155]">
-                                                    <Share2 className="h-4 w-4" />
-                                                </button>
-                                                <button className="p-1 text-gray-400 hover:text-red-500 rounded-md hover:bg-[#334155]">
-                                                    <Trash2 className="h-4 w-4" />
-                                                </button>
-                                            </div>
-                                            <div className="flex space-x-2">
-                                                <button
-                                                    onClick={() => toggleExpandSnippet(snippet.id)}
-                                                    className="px-2 py-1 text-xs text-gray-400 hover:text-white rounded-md hover:bg-[#334155]"
-                                                >
-                                                    {expandedSnippet === snippet.id ? "Show Less" : "Show More"}
-                                                </button>
-                                                <button
-                                                    onClick={() => copyToClipboard(snippet.snippet, snippet.id)}
-                                                    className="px-2 py-1 text-xs bg-[#334155] text-gray-300 hover:text-white rounded-md hover:bg-[#475569] flex items-center"
-                                                >
-                                                    <Clipboard className="h-3 w-3 mr-1" />
-                                                    {copied === snippet.id ? "Copied!" : "Copy"}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    </motion.div>
                                 ))}
                             </div>
                         )}

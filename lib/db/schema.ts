@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { InferInsertModel, relations } from "drizzle-orm";
 import { InferSelectModel } from "drizzle-orm";
+import { timeStamp } from "console";
 
 export const planEnum = pgEnum("plan", ["FREE", "GOLD", "DIAMOND"]);
 export const visibilityEnum = pgEnum("visibility", ["PRIVATE", "PUBLIC"]);
@@ -19,6 +20,7 @@ export const userTable = pgTable("users", {
   email: text("email").notNull().unique(),
   plan: planEnum("plan").default("FREE"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const snippetTable = pgTable("snippets", {

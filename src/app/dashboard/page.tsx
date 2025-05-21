@@ -22,8 +22,9 @@ import {
     ExternalLink,
 } from "lucide-react"
 import type { snippetType } from "../../../lib/db/schema"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, sync } from "framer-motion"
 import { useRouter } from "next/navigation"
+import { useUser } from "@clerk/nextjs"
 
 export default function Dashboard() {
     const initialState: FormState = { errors: {} }
@@ -36,6 +37,32 @@ export default function Dashboard() {
     const [activeFilter, setActiveFilter] = useState<string>("all")
     const sidebarRef = useRef<HTMLDivElement>(null)
     const router = useRouter()
+    const { isSignedIn, user } = useUser()
+    const [synced, setSynced] = useState(false)
+
+
+
+
+    useEffect(() => {
+        if (isSignedIn && user && !synced) {
+            fetch("/api/webhooks/clerk", {
+                method: "POST",
+                headers: {
+                    'Content-Type': "application/json"
+                },
+                body: JSON.stringify({
+                    id: user.id,
+                    username: user.username,
+                    email: user.primaryEmailAddress?.emailAddress
+                })
+            }).then(() => {
+                setSynced(true)
+            })
+                .catch((err) => {
+                    console.error("Failed to sync the user: ", err)
+                })
+        }
+    }, [isSignedIn, user, synced])
 
     useEffect(() => {
         const fetchSnippets = async () => {

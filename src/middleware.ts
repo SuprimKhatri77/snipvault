@@ -3,6 +3,10 @@ import { createRouteMatcher, clerkMiddleware } from "@clerk/nextjs/server";
 const isPublicRoute = createRouteMatcher(["/", "/sign-in", "/sign-up"]);
 
 export default clerkMiddleware(async (auth, req) => {
+  if (req.nextUrl.pathname.startsWith("/api/stripe/webhook")) {
+    // Return nothing → Next.js continues to your route.ts
+    return;
+  }
   const { userId, redirectToSignIn } = await auth();
 
   if (userId && req.nextUrl.pathname === "/") {
@@ -28,9 +32,8 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
+    // Everything except Next.js internals & static assets,
+    // BUT NOT the Stripe webhook:
+    "/((?!_next|.*\\.(?:js|css|png|jpg|jpeg|webp|svg|ico)|api/stripe/webhook).*)",
   ],
 };

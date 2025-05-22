@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "../lib/db";
-import { snippetTable } from "../lib/db/schema";
+import { userTable, snippetTable } from "../lib/db/schema";
 import { auth } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm";
+import { eq, count } from "drizzle-orm";
 import { z } from "zod";
 
 export type FormState = {
@@ -17,6 +17,9 @@ export type FormState = {
   };
   message?: string | null;
   success?: boolean;
+  limitReached?: boolean;
+  currentCount?: number;
+  maxCount?: number;
 };
 
 const SnippetSchema = z.object({
@@ -26,6 +29,41 @@ const SnippetSchema = z.object({
   visibility: z.enum(["PUBLIC", "PRIVATE"]),
 });
 
+// Plan limits for snippets
+const PLAN_LIMITS = {
+  FREE: 2,
+  GOLD: 100,
+  DIAMOND: 400,
+};
+
+// Get user's plan and snippet count
+async function getUserPlanAndSnippetCount(userId: string) {
+  // Get user's plan
+  const userResult = await db
+    .select({ plan: userTable.plan })
+    .from(userTable)
+    .where(eq(userTable.id, userId))
+    .limit(1);
+  const userPlan = userResult.length > 0 ? userResult[0].plan : "FREE";
+
+  // Count user's snippets
+  const snippetCountResult = await db
+    .select({ value: count() })
+    .from(snippetTable)
+    .where(eq(snippetTable.userId, userId));
+
+  const snippetCount = snippetCountResult[0]?.value || 0;
+  const maxSnippets =
+    PLAN_LIMITS[userPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.FREE;
+
+  return {
+    plan: userPlan,
+    snippetCount,
+    maxSnippets,
+    canCreateMore: snippetCount < maxSnippets,
+  };
+}
+
 export async function addSnippet(prevState: FormState, formData: FormData) {
   const { userId } = await auth();
 
@@ -33,6 +71,22 @@ export async function addSnippet(prevState: FormState, formData: FormData) {
     return {
       errors: {},
       message: "You must be logged in to create a snippet",
+    };
+  }
+
+  // Check user's plan and snippet count
+  const { snippetCount, maxSnippets, canCreateMore } =
+    await getUserPlanAndSnippetCount(userId);
+
+  // If user has reached their plan limit
+  if (!canCreateMore) {
+    return {
+      errors: {},
+      message: "You've reached your plan's snippet limit",
+      limitReached: true,
+      currentCount: snippetCount,
+      maxCount: maxSnippets,
+      success: false,
     };
   }
 
@@ -62,7 +116,12 @@ export async function addSnippet(prevState: FormState, formData: FormData) {
     });
 
     revalidatePath("/dashboard");
-    return { message: "Snippet created successfully", success: true };
+    return {
+      message: "Snippet created successfully",
+      success: true,
+      currentCount: snippetCount + 1,
+      maxCount: maxSnippets,
+    };
   } catch (error) {
     console.error("Error creating snippet:", error);
     return {
@@ -236,4 +295,28 @@ export async function deleteSnippet(id: string) {
     console.error("Error deleting snippet:", error);
     throw new Error("Failed to delete snippet");
   }
+}
+
+export async function getUserSnippetStats() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return {
+      currentCount: 0,
+      maxCount: PLAN_LIMITS.FREE,
+      percentage: 0,
+      plan: "FREE",
+    };
+  }
+
+  const { plan, snippetCount, maxSnippets } = await getUserPlanAndSnippetCount(
+    userId
+  );
+
+  return {
+    currentCount: snippetCount,
+    maxCount: maxSnippets,
+    percentage: Math.round((snippetCount / maxSnippets) * 100),
+    plan,
+  };
 }

@@ -5,11 +5,9 @@ import {
   uuid,
   varchar,
   timestamp,
-  index,
 } from "drizzle-orm/pg-core";
 import { InferInsertModel, relations } from "drizzle-orm";
 import { InferSelectModel } from "drizzle-orm";
-import { timeStamp } from "console";
 
 export const planEnum = pgEnum("plan", ["FREE", "GOLD", "DIAMOND"]);
 export const visibilityEnum = pgEnum("visibility", ["PRIVATE", "PUBLIC"]);

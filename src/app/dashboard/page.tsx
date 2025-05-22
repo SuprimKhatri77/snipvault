@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useActionState } from "react"
-import { addSnippet, type FormState } from "../../../actions/snippet"
-import { getAllSnippets } from "../../../data/snippet"
+import { addSnippet, type FormState, getUserSnippetStats } from "../../../actions/snippet"
+import { getAllSnippets } from "../../../actions/snippet"
 import Link from "next/link"
 import {
     Eye,
@@ -20,11 +20,14 @@ import {
     User,
     Clock,
     ExternalLink,
+    Zap,
 } from "lucide-react"
 import type { snippetType } from "../../../lib/db/schema"
-import { motion, AnimatePresence, sync } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { useUser } from "@clerk/nextjs"
+import LimitReachedDialog from "@/components/LimitReachedDialog"
+import UsageMeter from "@/components/UsageMeter"
 
 export default function Dashboard() {
     const initialState: FormState = { errors: {} }
@@ -35,49 +38,77 @@ export default function Dashboard() {
     const [loading, setLoading] = useState<boolean>(true)
     const [copied, setCopied] = useState<string>("")
     const [activeFilter, setActiveFilter] = useState<string>("all")
+    const [showLimitDialog, setShowLimitDialog] = useState<boolean>(false)
+    const [usageStats, setUsageStats] = useState({
+        currentCount: 0,
+        maxCount: 10,
+        plan: "FREE",
+    })
     const sidebarRef = useRef<HTMLDivElement>(null)
     const router = useRouter()
     const { isSignedIn, user } = useUser()
     const [synced, setSynced] = useState(false)
-
-
-
 
     useEffect(() => {
         if (isSignedIn && user && !synced) {
             fetch("/api/webhooks/clerk", {
                 method: "POST",
                 headers: {
-                    'Content-Type': "application/json"
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     id: user.id,
                     username: user.username,
-                    email: user.primaryEmailAddress?.emailAddress
-                })
-            }).then(() => {
-                setSynced(true)
+                    email: user.primaryEmailAddress?.emailAddress,
+                }),
             })
+                .then(() => {
+                    setSynced(true)
+                })
                 .catch((err) => {
                     console.error("Failed to sync the user: ", err)
                 })
         }
     }, [isSignedIn, user, synced])
 
+    // Fetch snippets and usage stats
     useEffect(() => {
-        const fetchSnippets = async () => {
+        const fetchData = async () => {
             try {
-                const data = await getAllSnippets()
-                setSnippets(data || [])
+                const [snippetsData, statsData] = await Promise.all([getAllSnippets(), getUserSnippetStats()])
+
+                setSnippets(snippetsData || [])
+                setUsageStats({
+                    currentCount: statsData.currentCount,
+                    maxCount: statsData.maxCount,
+                    plan: statsData.plan as string,
+                })
             } catch (error) {
-                console.error("Error fetching snippets:", error)
+                console.error("Error fetching data:", error)
             } finally {
                 setLoading(false)
             }
         }
 
-        fetchSnippets()
+        fetchData()
     }, [])
+
+    // Check for limit reached in form submission response
+    useEffect(() => {
+        if (state.limitReached) {
+            setShowLimitDialog(true)
+            setShowForm(false)
+        }
+
+        if (state.success && state.currentCount !== undefined && state.maxCount !== undefined) {
+            // Update usage stats after successful snippet creation
+            setUsageStats({
+                currentCount: state.currentCount,
+                maxCount: state.maxCount,
+                plan: usageStats.plan,
+            })
+        }
+    }, [state])
 
     const copyToClipboard = (text: string, id: string) => {
         navigator.clipboard.writeText(text)
@@ -151,8 +182,26 @@ export default function Dashboard() {
         }
     }, [state.success, router])
 
+    const handleNewSnippetClick = () => {
+        // Check if user has reached their limit before showing the form
+        if (usageStats.currentCount >= usageStats.maxCount) {
+            setShowLimitDialog(true)
+        } else {
+            setShowForm(true)
+        }
+    }
+
     return (
         <div className="relative bg-[#0F172A] text-gray-100 max-w-[1600px] mx-auto w-full">
+            {/* Limit Reached Dialog */}
+            <LimitReachedDialog
+                isOpen={showLimitDialog}
+                onClose={() => setShowLimitDialog(false)}
+                currentCount={usageStats.currentCount}
+                maxCount={usageStats.maxCount}
+                plan={usageStats.plan}
+            />
+
             {/* Dashboard Layout */}
             <div className="flex flex-col lg:flex-row relative">
                 {/* Sidebar */}
@@ -166,7 +215,13 @@ export default function Dashboard() {
                                 <h2 className="text-lg font-semibold text-white">My Snippets</h2>
                                 <p className="text-sm text-gray-400 mt-1">Manage your code snippets</p>
                             </div>
-                            <nav className="mt-6 px-3 flex-1">
+
+                            {/* Usage Meter */}
+                            <div className="px-6 pb-4">
+                                <UsageMeter />
+                            </div>
+
+                            <nav className="mt-2 px-3 flex-1">
                                 <div className="space-y-1">
                                     <button
                                         className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg w-full ${activeFilter === "all"
@@ -202,7 +257,7 @@ export default function Dashboard() {
                             </nav>
                             <div className="p-4">
                                 <button
-                                    onClick={() => setShowForm(true)}
+                                    onClick={handleNewSnippetClick}
                                     className="w-full flex items-center justify-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                                 >
                                     <Plus className="mr-2 h-5 w-5" />
@@ -242,12 +297,15 @@ export default function Dashboard() {
                                 <button className="rounded-full bg-[#0F172A] p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer">
                                     <Filter className="h-5 w-5" />
                                 </button>
-                                <button className="rounded-full bg-[#0F172A] p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer" title="Order by Ascending">
+                                <button
+                                    className="rounded-full bg-[#0F172A] p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer"
+                                    title="Order by Ascending"
+                                >
                                     <SortAsc className="h-5 w-5" />
                                 </button>
                                 <div className="hidden md:block h-6 w-px bg-gray-600" />
                                 <button
-                                    onClick={() => setShowForm(true)}
+                                    onClick={handleNewSnippetClick}
                                     className="hidden md:flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
                                 >
                                     <Plus className="mr-1 h-4 w-4" />
@@ -275,6 +333,22 @@ export default function Dashboard() {
                                         ? "Snippets visible to everyone"
                                         : "Snippets only visible to you"}
                             </p>
+
+                            {/* Plan info */}
+                            <div className="mt-2 flex items-center">
+                                <span className="text-xs text-gray-400">
+                                    {usageStats.currentCount} of {usageStats.maxCount} snippets used on your {usageStats.plan} plan
+                                </span>
+                                {usageStats.plan === "FREE" && (
+                                    <Link
+                                        href="/pricing"
+                                        className="ml-3 inline-flex items-center text-xs text-green-400 hover:text-green-300"
+                                    >
+                                        <Zap className="h-3 w-3 mr-1" />
+                                        Upgrade for more
+                                    </Link>
+                                )}
+                            </div>
                         </div>
 
                         {/* Create Snippet Form */}
@@ -293,7 +367,10 @@ export default function Dashboard() {
                                                 <Code className="mr-2 h-5 w-5 text-green-500" />
                                                 Create New Snippet
                                             </h2>
-                                            <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-white cursor-pointer">
+                                            <button
+                                                onClick={() => setShowForm(false)}
+                                                className="text-gray-400 hover:text-white cursor-pointer"
+                                            >
                                                 <X className="h-5 w-5" />
                                             </button>
                                         </div>
@@ -399,7 +476,7 @@ export default function Dashboard() {
                                 </p>
                                 {!showForm && !searchTerm && (
                                     <button
-                                        onClick={() => setShowForm(true)}
+                                        onClick={handleNewSnippetClick}
                                         className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                                     >
                                         <Plus className="mr-2 h-5 w-5" />
@@ -469,7 +546,6 @@ export default function Dashboard() {
                                                     <Clock className="h-3 w-3 flex-shrink-0 mr-1" />
                                                     <span className="truncate">{formatDate(snippet.createdAt)}</span>
                                                 </div>
-
 
                                                 <div className="flex items-center gap-2 flex-shrink-0 sm:ml-auto">
                                                     <button

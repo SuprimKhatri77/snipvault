@@ -102,7 +102,7 @@ export default function Pricing() {
                                 </li>
                             </ul>
                             <button className="w-full py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 rounded-lg transition">
-                                Start 7-Day Free Trial
+                                Buy It Now
                             </button>
                         </div>
                     </motion.div>

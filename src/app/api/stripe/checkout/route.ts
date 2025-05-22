@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { currentUser } from "@clerk/nextjs/server";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-04-30.basil", // Use a supported API version
+  apiVersion: "2025-04-30.basil",
 });
 
 export async function POST(req: Request) {
@@ -27,7 +27,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get user email from Clerk
     const user = await currentUser();
     const userEmail = user?.emailAddresses[0]?.emailAddress || "";
 
@@ -39,8 +38,6 @@ export async function POST(req: Request) {
         ? `https://${process.env.VERCEL_URL}`
         : "http://localhost:3001");
 
-    // Create the checkout session with userId in metadata
-
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
@@ -48,7 +45,7 @@ export async function POST(req: Request) {
       success_url: `${appUrl}/dashboard?session_id={CHECKOUT_SESSION_ID}&success=true`,
       cancel_url: `${appUrl}/pricing?canceled=true`,
       metadata: {
-        userId, // This is crucial for identifying the user in the webhook
+        userId,
       },
       customer_email: userEmail,
     });

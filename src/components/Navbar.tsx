@@ -171,7 +171,7 @@ export default async function Navbar() {
                                                 <span>Features</span>
                                             </Link>
                                             <Link
-                                                href="#pricing"
+                                                href="/pricing"
                                                 className="flex items-center space-x-3 px-2 py-2 rounded-md text-gray-300 hover:text-white hover:bg-[#1E293B] transition"
                                             >
                                                 <FileText className="h-5 w-5" />
@@ -197,7 +197,7 @@ export default async function Navbar() {
                                 ) : (
                                     <div className="flex flex-col h-full">
                                         <div className="p-6 pb-4">
-                                            <form action="/search-filter" className="relative mb-4">
+                                            <form action="/search" className="relative mb-4">
                                                 <button type="submit" className="cursor-pointer">
 
                                                     <Search className="absolute left-3 top-2.5 text-gray-400 h-5 w-5" />
@@ -224,7 +224,7 @@ export default async function Navbar() {
                                                     <span>Dashboard</span>
                                                 </Link>
                                                 <Link
-                                                    href="/snippets"
+                                                    href="/"
                                                     className="flex items-center space-x-3 px-2 py-2 rounded-md text-gray-300 hover:text-white hover:bg-[#1E293B] transition"
                                                 >
                                                     <FileText className="h-5 w-5" />
@@ -295,7 +295,7 @@ export default async function Navbar() {
                                     Features
                                 </Link>
                                 <Link
-                                    href="#"
+                                    href="/pricing"
                                     className="text-gray-300 hover:text-white hover:bg-[#1E293B] px-3 py-2 rounded-md text-sm font-medium transition"
                                 >
                                     Pricing

@@ -19,6 +19,7 @@ import {
     AlertTriangle,
 } from "lucide-react"
 import type { snippetType } from "../../lib/db/schema"
+import { useUser } from "@clerk/nextjs"
 
 export default function SnippetDetailPage({ id }: { id: string }) {
     const router = useRouter()
@@ -29,6 +30,10 @@ export default function SnippetDetailPage({ id }: { id: string }) {
     const [isDeleting, setIsDeleting] = useState(false)
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const snippetId = id
+
+    const { user } = useUser()
+    const userId = user?.id
+
 
     useEffect(() => {
         const fetchSnippet = async () => {
@@ -165,8 +170,15 @@ export default function SnippetDetailPage({ id }: { id: string }) {
                                 <h1 className="text-2xl font-bold text-white">{snippet.title}</h1>
                                 <p className="text-gray-400 mt-2">{snippet.description || "No description provided"}</p>
                                 <div className="flex items-center mt-3 text-sm text-gray-500">
-                                    <User className="h-4 w-4 mr-1" />
-                                    <span className="mr-4">You</span>
+                                    {snippet.userId === userId && (
+                                        <>
+                                            <User className="h-4 w-4 mr-1" />
+
+                                            <span className="mr-4">
+                                                You
+                                            </span>
+                                        </>
+                                    )}
                                     <Clock className="h-4 w-4 mr-1" />
                                     <span>Created on {formatDate(snippet.createdAt)}</span>
                                 </div>
@@ -218,23 +230,27 @@ export default function SnippetDetailPage({ id }: { id: string }) {
                                 Share
                             </button>
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                            <Link
-                                href={`/snippets/${snippet.id}/edit`}
-                                className="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
-                            >
-                                <Edit className="mr-1.5 h-4 w-4" />
-                                Edit
-                            </Link>
-                            <button
-                                onClick={() => setShowDeleteConfirm(true)}
-                                className="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
-                                disabled={isDeleting}
-                            >
-                                <Trash2 className="mr-1.5 h-4 w-4" />
-                                {isDeleting ? "Deleting..." : "Delete"}
-                            </button>
-                        </div>
+                        {snippet.userId === userId && (
+
+                            <div className="flex flex-wrap gap-2">
+                                <Link
+                                    href={`/snippets/${snippet.id}/edit`}
+                                    className="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                                >
+                                    <Edit className="mr-1.5 h-4 w-4" />
+                                    Edit
+                                </Link>
+                                <button
+                                    onClick={() => setShowDeleteConfirm(true)}
+                                    className="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
+                                    disabled={isDeleting}
+                                >
+                                    <Trash2 className="mr-1.5 h-4 w-4" />
+                                    {isDeleting ? "Deleting..." : "Delete"}
+                                </button>
+                            </div>
+                        )}
+
                     </div>
                 </div>
 

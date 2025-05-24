@@ -7,7 +7,7 @@ export default function Pricing() {
         visible: { opacity: 1, y: 0 }
     };
     return (
-        <section className="py-24 bg-gray-900 relative">
+        <section className="py-24 bg-gray-900 relative h-full">
             <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/20 to-gray-900 opacity-50"></div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <motion.div
@@ -153,6 +153,5 @@ export default function Pricing() {
                 </div>
             </div>
         </section>
-
     )
 }

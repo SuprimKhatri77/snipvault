@@ -197,16 +197,19 @@ export default async function Navbar() {
                                 ) : (
                                     <div className="flex flex-col h-full">
                                         <div className="p-6 pb-4">
-                                            <div className="relative mb-4">
-                                                <Search className="absolute left-3 top-2.5 text-gray-400 h-5 w-5" />
+                                            <form action="/search-filter" className="relative mb-4">
+                                                <button type="submit" className="cursor-pointer">
+
+                                                    <Search className="absolute left-3 top-2.5 text-gray-400 h-5 w-5" />
+                                                </button>
                                                 <input
                                                     type="text"
                                                     placeholder="Search snippets..."
                                                     className="bg-[#1E293B] border border-[#334155] rounded-lg py-2 pl-10 pr-4 w-full focus:outline-none focus:ring-2 focus:ring-green-500 text-sm
                                                     placeholder:text-gray-400 focus:text-gray-300"
-                                                    name="search"
+                                                    name="query"
                                                 />
-                                            </div>
+                                            </form>
                                         </div>
 
                                         <Separator className="bg-[#334155]" />
@@ -318,15 +321,18 @@ export default async function Navbar() {
                                 >
                                     Pricing
                                 </Link>
-                                <div className="relative">
+                                <form action="/search" className="relative">
                                     <input
                                         type="text"
                                         placeholder="Search snippets..."
                                         className="bg-[#1E293B] border border-[#334155] rounded-lg py-2 pl-10 pr-4 w-64 focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-400 focus:text-gray-300"
-                                        name="search"
+                                        name="query"
                                     />
-                                    <Search className="absolute left-3 top-2.5 text-gray-400 h-5 w-5" />
-                                </div>
+                                    <button type="submit" className="cursor-pointer">
+
+                                        <Search className="absolute left-3 top-2.5 text-gray-400 h-5 w-5" />
+                                    </button>
+                                </form>
                             </>
                         )}
                         <ClerkLoaded>
